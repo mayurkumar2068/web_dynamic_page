@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>नागरिक सेवा पोर्टल</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #004A99;
+            --dark-blue: #1B305B;
+            --light-blue: #F0F7FF;
+            --accent-blue: #007BFF;
+            --white: #FFFFFF;
+        }
+        body {
+            font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+            background-color: #f4f7fa;
+            color: #1e293b;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .app-container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+        .screen {
+            display: none;
+            padding-bottom: 100px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .category-card { 
+            transition: all 0.2s; 
+            border: 1px solid #e2e8f0;
+        }
+        .category-card:active { transform: scale(0.96); background-color: var(--light-blue); }
+        
+        .nav-active { color: var(--primary-blue) !important; }
+        .nav-active svg { fill: var(--primary-blue); stroke: var(--primary-blue); }
+
+        .notification-glow { animation: glow 2s infinite; }
+        @keyframes glow { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+
+        .action-badge {
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 300%;
+        }
+        .slide {
+            width: 100%;
+            flex-shrink: 0;
+        }
+        
+        .blue-gradient {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--accent-blue) 100%);
+        }
+
+        input:focus {
+            border-color: var(--primary-blue) !important;
+            box-shadow: 0 0 0 3px rgba(0, 74, 153, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- 1. HOME SCREEN -->
+    <section id="screen-home" class="screen active">
+        <header class="px-5 pt-8 pb-4 flex justify-between items-center sticky top-0 bg-white z-50 border-b border-slate-100">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">नमस्ते,</p>
+                <h1 class="text-xl font-bold text-[#1B305B]">प्रिय नागरिक</h1>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="showScreen('notifications')" class="p-2.5 bg-slate-50 rounded-full relative border border-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    <span class="absolute top-2 right-2.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="px-5 mt-4">
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <input type="text" placeholder="सेवा, श्रेणी या विभाग खोजें..." class="w-full bg-slate-50 border border-slate-200 py-4 pl-12 pr-4 rounded-2xl focus:bg-white outline-none transition-all font-medium text-slate-700">
+            </div>
+        </div>
+
+        <!-- 1. Eligibility Check Section -->
+        <div class="px-5 mt-6">
+            <div class="flex justify-between items-center mb-4 px-1">
+                <h2 class="text-xs font-bold text-[#1B305B] uppercase tracking-wider">अपनी पात्रता जानें</h2>
+                <div class="flex items-center gap-1.5 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                    <span class="text-[9px] font-bold text-blue-700 uppercase">14 सक्रिय योजनाएं</span>
+                </div>
+            </div>
+
+            <!-- Samagra ID Card -->
+            <div class="bg-white border border-blue-100 rounded-3xl p-5 shadow-sm mb-6">
+                <div class="relative">
+                    <input type="number" id="samagraInput" placeholder="समग्र आईडी (9 अंक) दर्ज करें" class="w-full bg-slate-50 border border-slate-200 py-4 pl-4 pr-14 rounded-2xl text-sm outline-none transition-all font-bold text-slate-800 shadow-inner">
+                    <button onclick="alert('पात्रता जांची जा रही है...')" class="absolute right-2 top-2 p-2.5 bg-[#004A99] text-white rounded-xl active:scale-95 transition-all shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="8"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Icons Outside the Card -->
+            <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-white border border-blue-50 shadow-sm flex items-center justify-center text-pink-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M12 16v6"/><path d="M9 19h6"/></svg></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">महिलाएं</span>
+                </div>
+                <div class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-white border border-blue-50 shadow-sm flex items-center justify-center text-green-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 21 2c-2 4-2.5 5.5-3.6 11.2A7 7 0 0 1 11 20Z"/><path d="M11 20v-5"/></svg></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">किसान</span>
+                </div>
+                <div class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-white border border-blue-50 shadow-sm flex items-center justify-center text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">छात्र</span>
+                </div>
+                <div class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-white border border-blue-50 shadow-sm flex items-center justify-center text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21h6"/><path d="M12 21V10"/><path d="M12 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/><path d="M7 10h10"/></svg></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">बुजुर्ग</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Latest Scheme Slider -->
+        <div class="px-5 mt-8 relative overflow-hidden">
+            <div class="overflow-hidden rounded-3xl shadow-lg">
+                <div class="slider-wrapper" id="mainSlider">
+                    <div class="slide relative h-44 blue-gradient p-6 text-white flex flex-col justify-center">
+                        <div class="z-10">
+                            <span class="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full mb-2 inline-block uppercase tracking-wider">नवीनतम योजना</span>
+                            <h3 class="text-xl font-bold leading-tight mb-3">लाड़ली बहना योजना:<br>पात्रता की सूची देखें</h3>
+                            <button class="bg-white text-[#1B305B] px-4 py-2 rounded-xl text-sm font-bold shadow-lg">चेक करें</button>
+                        </div>
+                    </div>
+                    <div class="slide relative h-44 bg-[#0056b3] p-6 text-white flex flex-col justify-center">
+                        <div class="z-10">
+                            <span class="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full mb-2 inline-block uppercase tracking-wider">कृषि विशेष</span>
+                            <h3 class="text-xl font-bold leading-tight mb-3">किसान सम्मान निधि:<br>15वीं किस्त जारी हुई</h3>
+                            <button class="bg-white text-blue-700 px-4 py-2 rounded-xl text-sm font-bold shadow-lg">विवरण देखें</button>
+                        </div>
+                    </div>
+                    <div class="slide relative h-44 bg-slate-800 p-6 text-white flex flex-col justify-center">
+                        <div class="z-10">
+                            <span class="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full mb-2 inline-block uppercase tracking-wider">युवा शक्ति</span>
+                            <h3 class="text-xl font-bold leading-tight mb-3">सीखो कमाओ योजना:<br>पंजीकरण शुरू</h3>
+                            <button class="bg-white text-slate-800 px-4 py-2 rounded-xl text-sm font-bold shadow-lg">पंजीकरण करें</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center gap-1.5 mt-3">
+                <div class="w-1.5 h-1.5 rounded-full bg-slate-300 slide-dot" id="dot0"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-slate-300 slide-dot" id="dot1"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-slate-300 slide-dot" id="dot2"></div>
+            </div>
+        </div>
+
+        <!-- 10 Categories Grid -->
+        <div class="px-5 mt-8 mb-8">
+            <h2 class="text-base font-bold text-slate-800 mb-4 px-1">मुख्य श्रेणियां</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div onclick="openCategory('सुविधा सेवाएँ, प्रमाणपत्र, लाइसेंस एवं कर')" class="category-card p-4 rounded-2xl bg-white flex flex-col gap-4 cursor-pointer shadow-sm">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004A99" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">सुविधा सेवाएँ, प्रमाणपत्र...</span>
+                </div>
+                <div onclick="openCategory('राजस्व, कृषि एवं ग्रामीण विकास')" class="category-card p-4 rounded-2xl bg-white flex flex-col gap-4 cursor-pointer shadow-sm">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004A99" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 21 2c-2 4-2.5 5.5-3.6 11.2A7 7 0 0 1 11 20Z"/><path d="M11 20v-5"/></svg></div>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">राजस्व, कृषि एवं ग्रामीण</span>
+                </div>
+                <div onclick="openCategory('पेंशन/लाभ, सामाजिक कल्याण एवं सशक्तिकरण')" class="category-card p-4 rounded-2xl bg-white flex flex-col gap-4 cursor-pointer shadow-sm">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004A99" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">पेंशन/लाभ एवं कल्याण</span>
+                </div>
+                <div onclick="openCategory('शिक्षा एवं अधिगम')" class="category-card p-4 rounded-2xl bg-white border-blue-200 border flex flex-col gap-4 cursor-pointer shadow-sm">
+                    <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shadow-md"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg></div>
+                    <span class="text-xs font-bold text-blue-900 leading-snug">शिक्षा एवं अधिगम</span>
+                </div>
+                <div onclick="openCategory('शहरीकरण, आवास और पर्यावरण')" class="category-card p-4 rounded-2xl bg-white flex flex-col gap-4 cursor-pointer shadow-sm">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004A99" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg></div>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">शहरीकरण और आवास</span>
+                </div>
+                <div onclick="openCategory('न्याय, कानून और शिकायत')" class="category-card p-4 rounded-2xl bg-white flex flex-col gap-4 cursor-pointer shadow-sm">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004A99" stroke-width="2"><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></div>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">न्याय और कानून</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. CATEGORY SCREEN (Education & Learning) - FULL RESTORATION -->
+    <section id="screen-category" class="screen">
+        <div class="sticky top-0 bg-white z-50 border-b border-slate-100">
+            <div class="px-5 py-6 flex items-center gap-4">
+                <button onclick="showScreen('home')" class="p-2 bg-blue-50 rounded-full border border-blue-100 text-[#004A99]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <h1 id="category-title" class="text-xl font-bold text-slate-800">शिक्षा एवं अधिगम</h1>
+            </div>
+            
+            <div class="px-5 mb-4">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                    <input type="text" placeholder="शिक्षा विभाग में खोजें..." class="w-full bg-slate-50 border border-slate-200 py-3 pl-10 pr-4 rounded-xl text-sm focus:border-blue-500 outline-none transition-all">
+                </div>
+            </div>
+        </div>
+
+        <div id="edu-content-wrapper">
+            <!-- Icons Section -->
+            <div class="px-5 py-6 bg-white edu-specific">
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-12 h-12 bg-blue-50 text-[#004A99] rounded-2xl flex items-center justify-center border border-blue-100"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase">प्रवेश</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-12 h-12 bg-blue-50 text-[#004A99] rounded-2xl flex items-center justify-center border border-blue-100"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/></svg></div>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase">प्रमाणपत्र</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-12 h-12 bg-blue-50 text-[#004A99] rounded-2xl flex items-center justify-center border border-blue-100"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase">रसीद</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-12 h-12 bg-blue-50 text-[#004A99] rounded-2xl flex items-center justify-center border border-blue-100"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v8"/><path d="m16 6-4 4-4-4"/><rect width="20" height="8" x="2" y="14" rx="2"/></svg></div>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase">अंकसूची</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Alert -->
+            <div class="px-5 mb-4 edu-specific">
+                <div class="bg-blue-900/5 border border-blue-900/20 rounded-2xl p-4 flex items-start gap-3">
+                    <div class="p-1.5 bg-blue-900 text-white rounded-lg notification-glow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                    <div class="flex-1">
+                        <h4 class="text-xs font-bold text-blue-900 uppercase tracking-wider mb-0.5">महत्वपूर्ण सूचना</h4>
+                        <p class="text-[11px] leading-relaxed text-blue-800/80 font-medium">छात्रवृत्ति आवेदन की अंतिम तिथि 31 मार्च तक बढ़ा दी गई है।</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- University Section - First -->
+            <div class="px-5 py-6 edu-specific">
+                <h3 class="text-[11px] font-bold text-[#004A99] uppercase tracking-widest mb-4 px-1">प्रमुख विश्वविद्यालय</h3>
+                <div class="space-y-3">
+                    <div onclick="openUniversityServices('बरकतउल्ला विश्वविद्यालय')" class="flex items-center gap-4 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm active:bg-blue-50 cursor-pointer transition-all">
+                        <div class="w-10 h-10 bg-[#1B305B] text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md">BU</div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-sm text-slate-800">बरकतउल्ला विश्वविद्यालय, भोपाल</h4>
+                            <p class="text-[10px] font-bold text-blue-600">8 सक्रिय सेवाएँ</p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-200"><path d="m9 18 6-6-6-6"/></svg>
+                    </div>
+                    <div onclick="alert('RGPV सेवाएं जल्द आ रही हैं')" class="flex items-center gap-4 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm active:bg-blue-50 cursor-pointer">
+                        <div class="w-10 h-10 bg-blue-700 text-white rounded-xl flex items-center justify-center font-bold text-xs">RGPV</div>
+                        <div class="flex-1"><h4 class="font-bold text-sm text-slate-800">राजीव गांधी प्रौद्योगिकी वि.वि.</h4></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-200"><path d="m9 18 6-6-6-6"/></svg>
+                    </div>
+                    <div onclick="alert('BHOJ सेवाएं जल्द आ रही हैं')" class="flex items-center gap-4 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm active:bg-blue-50 cursor-pointer">
+                        <div class="w-10 h-10 bg-slate-800 text-white rounded-xl flex items-center justify-center font-bold text-[10px] text-center">BHOJ</div>
+                        <div class="flex-1"><h4 class="font-bold text-sm text-slate-800">म.प्र. भोज (मुक्त) विश्वविद्यालय</h4></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-200"><path d="m9 18 6-6-6-6"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 mb-4 edu-specific"><hr class="border-slate-100"></div>
+
+            <!-- Department Groupings - Second -->
+            <div class="px-5 py-4 space-y-3 edu-specific">
+                <h3 class="text-[11px] font-bold text-[#004A99] uppercase tracking-widest mb-4 px-1">शिक्षा संबंधी विभाग</h3>
+                
+                <!-- उच्च शिक्षा विभाग -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button onclick="toggleAccordion('edu-1')" class="w-full px-5 py-4 flex justify-between items-center text-left active:bg-blue-50">
+                        <span class="font-bold text-slate-800 text-sm">उच्च शिक्षा विभाग</span>
+                        <svg id="arrow-edu-1" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400 transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div id="content-edu-1" class="hidden border-t border-blue-50 bg-blue-50/20 p-2 space-y-1">
+                        <div onclick="alert('सेवा लोड हो रही है...')" class="p-3 bg-white rounded-xl text-xs font-medium text-slate-600 border border-blue-50">छात्र जीवन चक्र (प्रवेश से डिग्री)</div>
+                    </div>
+                </div>
+
+                <!-- सामान्‍य प्रशासन विभाग -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button onclick="toggleAccordion('edu-2')" class="w-full px-5 py-4 flex justify-between items-center text-left active:bg-blue-50">
+                        <span class="font-bold text-slate-800 text-sm">सामान्‍य प्रशासन विभाग</span>
+                        <svg id="arrow-edu-2" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400 transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div id="content-edu-2" class="hidden border-t border-blue-50 bg-blue-50/20 p-3 text-xs text-slate-500">विभाग की अन्य सेवाएं...</div>
+                </div>
+
+                <!-- आयुष विभाग -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button onclick="toggleAccordion('edu-3')" class="w-full px-5 py-4 flex justify-between items-center text-left active:bg-blue-50">
+                        <span class="font-bold text-slate-800 text-sm">आयुष विभाग</span>
+                        <svg id="arrow-edu-3" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400 transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div id="content-edu-3" class="hidden border-t border-blue-50 bg-blue-50/20 p-3 text-xs text-slate-500">विभाग की अन्य सेवाएं...</div>
+                </div>
+
+                <!-- चिकित्सा शिक्षा विभाग -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button onclick="toggleAccordion('edu-4')" class="w-full px-5 py-4 flex justify-between items-center text-left active:bg-blue-50">
+                        <span class="font-bold text-slate-800 text-sm">चिकित्सा शिक्षा विभाग</span>
+                        <svg id="arrow-edu-4" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400 transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div id="content-edu-4" class="hidden border-t border-blue-50 bg-blue-50/20 p-3 text-xs text-slate-500">विभाग की अन्य सेवाएं...</div>
+                </div>
+
+                <!-- मध्यप्रदेश लोक सेवा आयोग -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button onclick="toggleAccordion('edu-5')" class="w-full px-5 py-4 flex justify-between items-center text-left active:bg-blue-50">
+                        <span class="font-bold text-slate-800 text-sm">मध्यप्रदेश लोक सेवा आयोग</span>
+                        <svg id="arrow-edu-5" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400 transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div id="content-edu-5" class="hidden border-t border-blue-50 bg-blue-50/20 p-2 space-y-1">
+                        <div class="p-3 bg-white rounded-xl text-xs font-medium text-slate-600">MPPSC ऑनलाइन आवेदन प्रणाली</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. UNIVERSITY SERVICES LIST -->
+    <section id="screen-uni-services" class="screen">
+        <div class="sticky top-0 bg-white z-50 border-b border-slate-100">
+            <div class="px-5 py-6 flex items-center gap-4">
+                <button onclick="showScreen('category')" class="p-2 bg-blue-50 rounded-full text-[#004A99]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-base font-bold text-slate-800 leading-tight" id="uni-list-title">विश्वविद्यालय</h1>
+                    <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">सेवाएं एवं रसीद</p>
+                </div>
+            </div>
+            
+            <div class="px-5 mb-4 mt-2">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                    <input type="text" id="uniSearchInput" oninput="filterUniServices()" placeholder="सेवाओं में खोजें..." class="w-full bg-slate-50 border border-slate-200 py-3 pl-10 pr-4 rounded-xl text-sm focus:border-blue-500 outline-none transition-all">
+                </div>
+            </div>
+        </div>
+        <div class="px-5 py-6 space-y-3" id="uni-services-container"></div>
+    </section>
+
+    <!-- 4. SERVICE INPUT FORM (Roll Number) -->
+    <section id="screen-service-form" class="screen">
+        <div class="sticky top-0 bg-white z-50 border-b border-slate-100">
+            <div class="px-5 py-6 flex items-center gap-4">
+                <button onclick="showScreen('uni-services')" class="p-2 bg-blue-50 rounded-full text-[#004A99]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-sm font-bold text-slate-800 leading-tight" id="form-service-title">विवरण दर्ज करें</h1>
+                    <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">विश्वविद्यालय रसीद</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-5 py-8">
+            <div class="bg-blue-50/30 border border-blue-100 rounded-3xl p-6 shadow-sm">
+                <label class="block text-xs font-bold text-[#1B305B] uppercase tracking-wider mb-3">रोल नंबर दर्ज करें (Enter Roll Number)</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B305B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <input type="text" id="rollNumberInput" placeholder="210045XXX" class="w-full bg-white border-2 border-blue-200 py-4 pl-12 pr-4 rounded-2xl focus:border-blue-600 outline-none transition-all font-bold text-slate-800 shadow-sm">
+                </div>
+            </div>
+
+            <button onclick="alert('खोज जारी है...')" class="w-full mt-8 py-4 px-6 bg-[#004A99] text-white font-bold rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                <span>खोजें</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- 5. NOTIFICATIONS -->
+    <section id="screen-notifications" class="screen">
+        <div class="px-5 pt-8 pb-4 sticky top-0 bg-white border-b border-slate-50 z-50">
+            <h1 class="text-xl font-bold text-slate-800">सूचनाएं</h1>
+        </div>
+        <div class="px-5 py-4 space-y-4">
+            <div class="p-4 bg-blue-50 border border-blue-100 rounded-2xl text-xs font-medium">कोई नई सूचना नहीं है।</div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="fixed bottom-0 w-full max-w-[450px] bg-white border-t border-blue-50 flex justify-between px-6 py-3 z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+        <div onclick="showScreen('home')" id="nav-home" class="nav-item nav-active flex flex-col items-center gap-1 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-center">होम</span>
+        </div>
+        <div onclick="showScreen('category')" id="nav-category" class="nav-item flex flex-col items-center gap-1 cursor-pointer text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-center">सेवाएं</span>
+        </div>
+        <div class="nav-item flex flex-col items-center gap-1 cursor-pointer text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-center">अर्जी</span>
+        </div>
+        <div class="nav-item flex flex-col items-center gap-1 cursor-pointer text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-center">प्रोफ़ाइल</span>
+        </div>
+    </nav>
+</div>
+
+<script>
+    const buServices = [
+        { name: "बरकतउल्ला विश्वविद्यालय - डुप्लीकेट मार्कशीट रसीद", type: "download", label: "डाउनलोड", action: "openForm" },
+        { name: "बरकतउल्ला विश्वविद्यालय - डिग्री रसीद", type: "track", label: "ट्रैक करें" },
+        { name: "बरकतउल्ला विश्वविद्यालय - पुनर्मूल्यांकन रसीद", type: "apply", label: "आवेदन करें" },
+        { name: "बरकतउल्ला विश्वविद्यालय - पुनः योग रसीद", type: "apply", label: "आवेदन करें" },
+        { name: "बरकतउल्ला विश्वविद्यालय - उत्तर पुस्तिका रसीद देखें", type: "download", label: "डाउनलोड" },
+        { name: "बरकतउल्ला विश्वविद्यालय – नामांकन शुल्क रसीद", type: "track", label: "चेक रसीद" },
+        { name: "बरकतउल्ला विश्वविद्यालय – परीक्षा शुल्क रसीद", type: "track", label: "चेक रसीद" },
+        { name: "बरकतउल्ला विश्वविद्यालय – माइग्रेशन शुल्क रसीद", type: "apply", label: "आवेदन करें" }
+    ];
+
+    let slideIndex = 0;
+    const slidesCount = 3;
+
+    function initSlider() {
+        const slider = document.getElementById('mainSlider');
+        setInterval(() => {
+            slideIndex = (slideIndex + 1) % slidesCount;
+            if(slider) slider.style.transform = `translateX(-${(slideIndex * 100) / slidesCount}%)`;
+            updateDots();
+        }, 4000);
+    }
+
+    function updateDots() {
+        document.querySelectorAll('.slide-dot').forEach((dot, idx) => {
+            dot.className = idx === slideIndex ? 'w-4 h-1.5 rounded-full bg-[#004A99] slide-dot transition-all' : 'w-1.5 h-1.5 rounded-full bg-slate-300 slide-dot';
+        });
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const targetScreen = document.getElementById(`screen-${screenId}`);
+        if (targetScreen) targetScreen.classList.add('active');
+        window.scrollTo(0,0);
+        
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('nav-active');
+            item.classList.add('text-slate-400');
+            const svg = item.querySelector('svg');
+            svg.setAttribute('fill', 'none');
+            svg.setAttribute('stroke', 'currentColor');
+        });
+        
+        const activeId = (screenId === 'uni-services' || screenId === 'service-form') ? 'category' : screenId;
+        const activeNav = document.getElementById(`nav-${activeId}`);
+        if (activeNav) {
+            activeNav.classList.add('nav-active');
+            activeNav.classList.remove('text-slate-400');
+            const svg = activeNav.querySelector('svg');
+            svg.setAttribute('fill', 'currentColor');
+            svg.setAttribute('stroke', 'none');
+        }
+    }
+
+    function openCategory(title) {
+        document.getElementById('category-title').innerText = title;
+        const eduSpecifics = document.querySelectorAll('.edu-specific');
+        if (title === 'शिक्षा एवं अधिगम') {
+            eduSpecifics.forEach(el => el.style.display = 'block');
+        } else {
+            eduSpecifics.forEach(el => el.style.display = 'none');
+        }
+        showScreen('category');
+    }
+
+    function openUniversityServices(uniName) {
+        document.getElementById('uniSearchInput').value = '';
+        document.getElementById('uni-list-title').innerText = uniName;
+        renderUniServices(buServices);
+        showScreen('uni-services');
+    }
+
+    function filterUniServices() {
+        const searchTerm = document.getElementById('uniSearchInput').value.toLowerCase();
+        const filtered = buServices.filter(s => s.name.toLowerCase().includes(searchTerm));
+        renderUniServices(filtered);
+    }
+
+    function renderUniServices(servicesList) {
+        const container = document.getElementById('uni-services-container');
+        container.innerHTML = '';
+        
+        if (servicesList.length === 0) {
+            container.innerHTML = `<div class="text-center py-10 text-slate-400 font-medium">कोई सेवा नहीं मिली</div>`;
+            return;
+        }
+
+        servicesList.forEach(service => {
+            let colorClass = "bg-blue-50 text-blue-700 border-blue-100 border";
+            if(service.type === 'download') colorClass = "bg-blue-600 text-white shadow-sm";
+            if(service.type === 'apply') colorClass = "bg-[#1B305B] text-white";
+            if(service.type === 'track') colorClass = "bg-blue-100 text-blue-800";
+
+            const clickAction = service.action === "openForm" 
+                ? `onclick="openServiceForm('${service.name}')"` 
+                : `onclick="alert('${service.name} सेवा अभी शुरू की जा रही है...')"` ;
+
+            container.innerHTML += `
+                <div ${clickAction} class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-3 active:bg-blue-50 transition-colors cursor-pointer">
+                    <h4 class="text-sm font-bold text-slate-800 leading-snug">${service.name}</h4>
+                    <div class="flex justify-between items-center">
+                        <span class="action-badge ${colorClass}">${service.label}</span>
+                        <div class="p-2 bg-slate-50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#004A99" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function openServiceForm(serviceTitle) {
+        document.getElementById('form-service-title').innerText = serviceTitle.replace('बरकतउल्ला विश्वविद्यालय - ', '');
+        showScreen('service-form');
+    }
+
+    function toggleAccordion(id) {
+        const content = document.getElementById(`content-${id}`);
+        const arrow = document.getElementById(`arrow-${id}`);
+        const isHidden = content.classList.contains('hidden');
+        if (isHidden) {
+            content.classList.remove('hidden');
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            content.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    window.onload = () => {
+        initSlider();
+        updateDots();
+    };
+</script>
+
+</body>
+</html>
